@@ -6,18 +6,32 @@ This .NET library provides routines to create and decrypt Fernet tokens.
 
 The Fernet standard is described here: https://github.com/fernet/spec/blob/master/Spec.md.
 
+The current (and only!) 0x80 version of Fernet is supported.
+
 ## Usage
+### Encryption without a Key
+The simplest token creation method doesn't require you to pre-generate a Fernet key. A cryptographically-secure key is generated for you and returned along with the encrypted token in a Tuple. All you need to supply is the plaintext you want to encrypt.
+
+```csharp
+(string key, string token) = Cryptography.Fernet.Encrypt(plaintext);
+// Now save the key for decrypting the token later on...
+```
+
+Note: internally, the `System.Security.Cryptography.RandomNumberGenerator` is used to generate the key.
+
 ### Encryption with a Key
-To encrypt a plaintext message with a pre-existing key, call:
+To encrypt a plaintext message with a pre-existing key, pass it in as the first parameter:
 
 ```csharp
 string token = Cryptography.Fernet.Encrypt(key, plaintext);
 ```
 
-##### A Note on the Fernet Key Format
-Your key must be in 'base64url' format. This is identical to plain base64 but with 2 character substitutions to make the strings usable in URLs and filenames. It is described as part of RFC 4648 here: https://www.rfc-editor.org/rfc/rfc4648#section-5.
+#### A Note on the Fernet Key Format
+Fernet Keys must be in 'base64url' format. This is identical to plain base64 but with 2 character substitutions to make the strings usable in URLs and as filenames. It is described as part of RFC 4648 here: https://www.rfc-editor.org/rfc/rfc4648#section-5.
 
-This project includes a `Base64UrlEncoder` class which can be used to convert byte arrays to and from this format. For example:
+This project includes a `Utility.Base64UrlEncoder` class which can be used to convert byte arrays to and from this format.
+
+The following example shows how to use the encoder class before calling `Encrypt` to generate the Fernet token.
 
 ```csharp
 // Create a byte array of the correct size and fill it with random bytes.
@@ -29,17 +43,10 @@ string keyString = Utility.Base64UrlEncoder.Encode(key);
 string token = Encrypt(keyString, "My plaintext string.");
 ```
 
-Also see directly below about creating a Fernet token without using a pre-existing key.
-
-### Encryption without a Key
-As a convenience, the library can generate a cryptographically-secure Fernet key for you. To take advantage of this, simply call `Encrypt` and only pass in a message parameter. `Encrypt` will return a tuple containing the new key and the token which was encrypted using it.
-
-```csharp
-(string key, string token) = Cryptography.Fernet.Encrypt(plaintext);
-```
+If you have no need to use a specific key, it is recommended to use the `Encrypt` overload detailed above which has only the plaintext parameter; this will handle creating a secure key for you.
 
 ### Decryption
-To retrieve the original plaintext contents, pass the encrypted token and the Fernet key to the `Decrypt` method:
+To retrieve the original plaintext contents, pass the Fernet key and the encrypted token to the `Decrypt` method:
 
 ```csharp
 string originalMessage = Cryptography.Fernet.Decrypt(key, token);
@@ -60,7 +67,7 @@ A limitation of the Fernet specification is that the original token creation tim
 ## Testing
 A separate MSTest project with several unit tests is included in the solution.
 
-To run the tests, either use the Test Explorer within Visual Studio (within the Test main menu) or open a command prompt, navigate to the solution folder and execute the following:
+To run the tests, either use the Test Explorer within Visual Studio (within the `Test` main menu) or open a command prompt, navigate to the solution folder and execute the following:
 
 ```
 dotnet test

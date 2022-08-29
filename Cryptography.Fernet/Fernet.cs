@@ -16,7 +16,7 @@ public static class Fernet
     private const int IVSize = 16;
     private const int TimestampSize = 8;
     // Ciphertext starts after Version, Timestamp and IV fields.
-    private const int CipertextStart = 1 + TimestampSize + IVSize;
+    private const int CiphertextStart = 1 + TimestampSize + IVSize;
     private const int HmacSize = 32;
 
     /// <summary>
@@ -29,35 +29,35 @@ public static class Fernet
     public static string Encrypt(string key, string message)
     {
         byte[] keyBytes = ValidateAndDecodeKeyString(key);
+        byte[] messageBytes = Encoding.UTF8.GetBytes(message);
+
         // Creation time is the number of seconds since midnight Jan 1st
         // 1970 UTC.
         ulong timestamp = (ulong)DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-        // The time field must be stored in big-endian format so reverse it.
         byte[] timeBytes = BitConverter.GetBytes(timestamp);
+        // The time field must be stored in big-endian format.
         if (BitConverter.IsLittleEndian)
         {
             timeBytes = timeBytes.Reverse().ToArray();
         }
 
-        byte[] messageBytes = Encoding.UTF8.GetBytes(message);
-
         using var aes = Aes.Create();
-        aes.Key = keyBytes[^EncryptionKeySize..];
+        // Use the second half of the key byte array as the AES encryption key.
+        aes.Key = keyBytes[SigningKeySize..];
         aes.GenerateIV();
         // TODO: encryptcbc has an overload which fills in a span directly. Use that?
         byte[] encryptedMessage = aes.EncryptCbc(messageBytes, aes.IV);
 
-        byte[] token = new byte[1 + TimestampSize + IVSize +
-            encryptedMessage.Length + HmacSize];
+        int tokenSizeMinusHmac = CiphertextStart + encryptedMessage.Length;
+        byte[] token = new byte[tokenSizeMinusHmac + HmacSize];
         token[0] = FernetVersion;
         timeBytes.CopyTo(token, 1);
         aes.IV.CopyTo(token, 1 + TimestampSize);
-        encryptedMessage.CopyTo(token, CipertextStart);
+        encryptedMessage.CopyTo(token, CiphertextStart);
 
         using var hmac = new HMACSHA256(keyBytes[..SigningKeySize]);
-        var hash = hmac.ComputeHash(
-            token, 0, CipertextStart + encryptedMessage.Length);
-        hash.CopyTo(token, CipertextStart + encryptedMessage.Length);
+        var hash = hmac.ComputeHash(token, 0, tokenSizeMinusHmac);
+        hash.CopyTo(token, tokenSizeMinusHmac);
 
         return Base64UrlEncoder.Encode(token);
     }
@@ -95,7 +95,7 @@ public static class Fernet
         Span<byte> decoded = Base64UrlEncoder.DecodeBytes(token).AsSpan();
         if (decoded[0] != FernetVersion)
         {
-            throw new ArgumentException(
+            throw new CryptographicException(
                 $"Fernet version must be 0x{FernetVersion:X}.",
                 nameof(token));
         }
@@ -113,7 +113,7 @@ public static class Fernet
         if (!new ReadOnlySpan<byte>(computedHash)
             .SequenceEqual(decoded.Slice(decoded.Length - HmacSize, HmacSize)))
         {
-            throw new ArgumentException(
+            throw new CryptographicException(
                 "Invalid token. HMAC is incorrect.", nameof(token));
         }
 
@@ -138,7 +138,7 @@ public static class Fernet
             var expiry = timestamp.Add(tokenLifetime.Value);
             if (timeCalled > expiry)
             {
-                throw new ApplicationException(
+                throw new CryptographicException(
                     $"Token expired at {expiry:G}. Current time is {timeCalled:G}.");
             }
         }
@@ -149,7 +149,7 @@ public static class Fernet
         aes.IV = decoded.Slice(1 + TimestampSize, IVSize).ToArray();
 
         byte[] ciphertext = decoded.Slice(
-            CipertextStart, decoded.Length - CipertextStart - HmacSize).ToArray();
+            CiphertextStart, decoded.Length - CiphertextStart - HmacSize).ToArray();
         byte[] decrypted = aes.DecryptCbc(ciphertext, aes.IV);
 
         // Clear AES state and secret key copy.

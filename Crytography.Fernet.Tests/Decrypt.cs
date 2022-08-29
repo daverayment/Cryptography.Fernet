@@ -43,7 +43,7 @@ public partial class FernetTests
     {
         string key = Base64UrlEncoder.Encode(
             RandomNumberGenerator.GetBytes(Fernet.KeySize));
-        Assert.ThrowsException<ArgumentException>(() =>
+        Assert.ThrowsException<CryptographicException>(() =>
             Fernet.Decrypt(key, TestToken));
     }
 
@@ -52,7 +52,7 @@ public partial class FernetTests
     {
         byte[] testTokenBytes = Base64UrlEncoder.DecodeBytes(TestToken);
         testTokenBytes[0] = 0;
-        Assert.ThrowsException<ArgumentException>(() => 
+        Assert.ThrowsException<CryptographicException>(() => 
             Fernet.Decrypt(Key, Base64UrlEncoder.Encode(testTokenBytes)));
     }
 
@@ -64,7 +64,7 @@ public partial class FernetTests
         // particular test. This will alter the subsequent message hash.
         // Timestamp starts at index 1 and is 8 bytes.
         testTokenBytes[1] = 1;
-        Assert.ThrowsException<ArgumentException>(() =>
+        Assert.ThrowsException<CryptographicException>(() =>
             Fernet.Decrypt(Key, Base64UrlEncoder.Encode(testTokenBytes)));
     }
 
@@ -73,7 +73,7 @@ public partial class FernetTests
     {
         string newToken = Fernet.Encrypt(Key, TestMessage);
         Thread.Sleep(1000);
-        Assert.ThrowsException<ApplicationException>(() =>
+        Assert.ThrowsException<CryptographicException>(() =>
             Fernet.Decrypt(Key, newToken, TimeSpan.FromSeconds(1)));
     }
 
@@ -82,5 +82,13 @@ public partial class FernetTests
     {
         string newToken = Fernet.Encrypt(Key, TestMessage);
         Fernet.Decrypt(Key, newToken, TimeSpan.FromSeconds(1));
+    }
+
+    [TestMethod]
+    public void DecryptTokenExpiryWorksWhenTokenLifetimeIsNegative()
+    {
+        string newToken = Fernet.Encrypt(Key, TestMessage);
+        Assert.ThrowsException<CryptographicException>(() =>
+            Fernet.Decrypt(Key, newToken, TimeSpan.FromSeconds(-10)));
     }
 }

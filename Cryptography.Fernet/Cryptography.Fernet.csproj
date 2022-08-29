@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
@@ -12,6 +12,7 @@
     <Copyright>Copyright (c) 2022 David Rayment</Copyright>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageIcon>Images\001-key-lock-128x128.png</PackageIcon>
+	<VersionPrefix>1.0.1</VersionPrefix>
   </PropertyGroup>
 
   <ItemGroup>

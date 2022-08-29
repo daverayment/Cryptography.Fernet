@@ -78,4 +78,4 @@ You should see results similar to this:
 ![image](https://user-images.githubusercontent.com/7127766/187106455-29046500-9a64-4cb0-8eeb-838fd110d04f.png)
 
 ## Attributions
-<a href="https://www.flaticon.com/free-icons/file" title="file icons">File icons created by Payungkead - Flaticon</a>
+[File icons created by Payungkead - Flaticon](https://www.flaticon.com/free-icons/file "file icons")

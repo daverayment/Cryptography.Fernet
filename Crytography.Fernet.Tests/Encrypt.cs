@@ -36,5 +36,14 @@ namespace Cryptography.UnitTesting
             Assert.ThrowsException<ArgumentException>(() =>
                 Fernet.Encrypt(longKey, "Test."));
         }
+
+        [TestMethod]
+        public void EncryptWithJustMessageParameterSucceeds()
+        {
+            (string key, string token) = Fernet.Encrypt(TestMessage);
+            Assert.IsTrue(key != null && key.Length > 0);
+            Assert.IsTrue(token != null && token.Length > 0);
+            Assert.AreEqual(Fernet.Decrypt(key, token), TestMessage);
+        }
     }
 }

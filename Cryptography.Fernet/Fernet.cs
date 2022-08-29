@@ -63,6 +63,23 @@ public static class Fernet
     }
 
     /// <summary>
+    /// Convenience method which creates a cryptographically-strong key for you
+    /// before encrypting the message provided.
+    /// </summary>
+    /// <param name="message">The plaintext string to encrypt.</param>
+    /// <returns>A tuple containing the key and the Fernet token, both in 
+    /// base64url format.</returns>
+    public static (string key, string token) Encrypt(string message)
+    {
+        byte[] key = new byte[KeySize];
+        RandomNumberGenerator.Fill(key);
+        string keyBase64 = Base64UrlEncoder.Encode(key);
+        string token = Encrypt(keyBase64, message);
+
+        return (keyBase64, token);
+    }
+
+    /// <summary>
     /// Verify and decrypt a fernet token.
     /// </summary>
     /// <param name="key">The fernet key used to encrypt the token. 

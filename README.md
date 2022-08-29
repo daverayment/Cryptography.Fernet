@@ -62,7 +62,9 @@ A separate MSTest project with several unit tests is included in the solution.
 
 To run the tests, either use the Test Explorer within Visual Studio (within the Test main menu) or open a command prompt, navigate to the solution folder and execute the following:
 
-```dotnet test```
+```
+dotnet test
+```
 
 You should see results similar to this:
 

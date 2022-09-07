@@ -22,9 +22,8 @@ public static class Base64UrlEncoder
         str = str.Replace('-', '+').Replace('_', '/') +
             (str.Length % 4) switch
             {
-                1 => throw new ArgumentException(
-                    "Illegal padding. Cannot decode Base64 URL string.",
-                    nameof(str)),
+                1 => throw new FormatException(
+                    "Illegal padding. Cannot decode Base64 URL string."),
                 2 => "==",
                 3 => "=",
                 _ => ""

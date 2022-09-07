@@ -8,7 +8,10 @@
     <RepositoryUrl>https://github.com/daverayment/Cryptography.Fernet</RepositoryUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Authors>daverayment</Authors>
-    <Description>A .NET implementation of the full Fernet symmetric encryption standard.</Description>
+    <Description>
+		A .NET implementation of the full Fernet symmetric encryption standard.
+		See https://github.com/daverayment/Cryptography.Fernet/blob/master/RELEASE.md for further information about this release.
+	</Description>
     <Copyright>Copyright (c) 2022 David Rayment</Copyright>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageIcon>Images\001-key-lock-128x128.png</PackageIcon>

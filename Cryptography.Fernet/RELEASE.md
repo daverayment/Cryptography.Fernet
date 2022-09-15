@@ -1,4 +1,8 @@
-﻿# Version 1.1.0
+﻿# Version 1.1.1
+
+Minor bugfix release to correct the package link to the `RELEASE.md` file. Also fixed the formatting of the description text for NuGet.
+
+# Version 1.1.0
 
 ## New functionality
 - A `saveTimestamp` parameter was added to `Encrypt`. This defaults to `true`, which provides the same functionality as prior releases. Setting to `false` means the token will be generated with a zeroed-out creation timestamp. This is a solution for certain scenarios where unencrypted timestamps such as Fernet's are regarded as sensitive information.

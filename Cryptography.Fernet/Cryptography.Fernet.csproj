@@ -14,8 +14,8 @@ See https://github.com/daverayment/Cryptography.Fernet/blob/master/RELEASE.md fo
     <Copyright>Copyright (c) 2022 David Rayment</Copyright>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageIcon>Images\001-key-lock-128x128.png</PackageIcon>
-    <VersionPrefix>1.1.1</VersionPrefix>
-    <PackageReleaseNotes>Minor bugfix release to correct RELEASE.md documentation link.</PackageReleaseNotes>
+    <VersionPrefix>1.1.2</VersionPrefix>
+    <PackageReleaseNotes>Minor source code formatting corrections.</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>

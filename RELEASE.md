@@ -1,4 +1,8 @@
-﻿# Version 1.1.1
+﻿# Version 1.1.2
+
+Minor source code formatting corrections.
+
+# Version 1.1.1
 
 Minor bugfix release to correct the package link to the `RELEASE.md` file. Also fixed the formatting of the description text for NuGet.
 

@@ -14,14 +14,17 @@ public static class Base64UrlEncoder
 	/// <param name="str">The encoded string in URL-safe Base64 format.
 	/// </param>
 	/// <returns>A new byte array containing the decoded output.</returns>
-	/// <exception cref="ArgumentException">Raised if the input string had 
+	/// <exception cref="FormatException">Raised if the input string had 
 	/// invalid padding. Only 2 or 3 padding characters ('=') are valid.
 	/// </exception>
 	public static byte[] DecodeBytes(string str)
 	{
+		// Do the character replacement and pad if necesary to align to next
+		// 4-character boundary.
 		str = str.Replace('-', '+').Replace('_', '/') +
 			(str.Length % 4) switch
 			{
+				// Requires 3 padding characters, which is invalid Base64.
 				1 => throw new FormatException(
 					"Illegal padding. Cannot decode Base64 URL string."),
 				2 => "==",

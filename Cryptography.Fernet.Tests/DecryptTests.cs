@@ -41,7 +41,15 @@ public partial class FernetTests
 	}
 
 	[TestMethod]
-	public void DecryptThrowsIfFernetTokenVersionNumberDoesNotMatch()
+	public void DecryptThrowsIfTokenIsBlank()
+	{
+		(string key, string token) = Fernet.Encrypt("Test");
+		Assert.ThrowsException<ArgumentException>(() =>
+			Fernet.Decrypt(key, ""));
+	}
+
+	[TestMethod]
+	public void DecryptThrowsIfTokenVersionNumberDoesNotMatch()
 	{
 		(string key, string token) = Fernet.Encrypt("Test");
 		byte[] testTokenBytes = Base64UrlEncoder.DecodeBytes(token);
